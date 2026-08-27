@@ -54,8 +54,15 @@ document.addEventListener("DOMContentLoaded", () => {
               );
 
               if (!response.ok) {
-                const result = await response.json();
-                throw new Error(result.detail || "Unable to unregister participant");
+                let errorMessage = "Unable to unregister participant";
+                try {
+                  const result = await response.json();
+                  errorMessage = result.detail || errorMessage;
+                } catch (parseError) {
+                  // Response body wasn't valid JSON (e.g. plain text/HTML error page);
+                  // fall back to the default error message above.
+                }
+                throw new Error(errorMessage);
               }
 
               await fetchActivities();
